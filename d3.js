@@ -8,7 +8,7 @@ window.onload = async () => {
     for (let player of data) {
         playerSet.add(player.player_name)
     }
-    players = Array.from(playerSet)
+    players = Array.from(playerSet).sort()
     makePlayerList()
 
 }
@@ -32,6 +32,6 @@ function handlePlayerOnClick(e,d){
     let element = d3.select(this)
     element.classed("selected", !element.classed("selected"))
 
-    
+
 
 }
