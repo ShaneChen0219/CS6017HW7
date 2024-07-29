@@ -10,7 +10,23 @@
     overflow-y: scroll;
     display: inline-block;
     direction: ltr;
+    background: rgba(0, 0, 255, 0.3); /* Adding a transparent blue background */
+    position: relative;
 }
+
+#nbaplayers::before {
+    content: "";
+    background: url('nba.svg') no-repeat center center;
+    background-size: cover;
+    opacity: 0.5; /* Adjust opacity to make the image transparent */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Place the image behind the content */
+}
+
 
 div {
     border: 3px solid black;
