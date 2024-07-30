@@ -11,10 +11,12 @@ window.onload = async () => {
     players = Array.from(playerSet).sort()
     makePlayerList()
 
+    let countries = Array.from(new Set(data.map(d => d.country)));
+    console.log("Unique Countries:", countries);
+
 }
 
 function makePlayerList(){
-    
     d3.select('#nbaplayers').selectAll('p')
     .data(players)
     // in join there are 3 actions enter, update and exit
@@ -50,6 +52,7 @@ function handlePlayerOnClick(e,d){
         selectedPlayer =selectedPlayer.filter(player => player.name !== d);
     }
     updateGraph()
+    updateCountry()
 }
 
 function updateGraph(){
@@ -117,3 +120,43 @@ function updateSimulation(){
         // Slow down the simulation
         .restart();
 }
+
+
+// As a player is selected, their country (and a count of the players FROM that country) will show on our "#country" as a flag.
+function updateCountry(activeEdges) {
+    // Check the most recently selected player 
+    // Pull its country from the map we made
+    // Use that to check if this is w/n our set of flags
+    // Add if not
+    // Clear the flags
+    // Re-print them
+
+
+
+
+    // const images = ['FlagImages/USA.png', 'FlagImages/Canada.png', 'FlagImages/USA.png', 'FlagImages/Jamacia.png', 'FlagImages/Lithuania.png', 'FlagImages/Nigeria.png'];
+    const images = ['FlagImages/USA.png', 'FlagImages/Canada.png'];
+
+    const div = d3.select('#country');
+    // div.selectAll('img').remove();
+
+    // Append new images
+    images.forEach(src => {
+        div.append('img')
+            .attr('src', src)
+            .attr('alt', 'Country flag')
+            .style('width', '125px')
+            .style('height', '125px');
+    });
+}
+
+// Plan: 
+// Make a map (parse the country appreviation and make that the key)
+// When a player gets clicked, parse their origin country, pull from map, and update the file to pull
+// Note: Do we even need a map? Or can we just convert that to a string and concat .jpg to it....
+// May not even need one tbh
+
+
+// Accessing data into csv's is O(n). So, we could do a map w/ key of player name and val would be of country
+// Somehow pull this certain element/name w/ "this" somewhere above in the code 
+// Then convert to a string, concat .jpg and pull the img
