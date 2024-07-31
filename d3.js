@@ -15,12 +15,9 @@ window.onload = async () => {
     players = Array.from(playerSet).sort()
     makePlayerList()
   
-  
-
     // Used to know which flags I need to get from google
     let countries = Array.from(new Set(data.map(d => d.country)));
     console.log("Unique Countries:", countries);
-
 }
 
 function makePlayerList(){
@@ -55,11 +52,13 @@ function handlePlayerOnClick(e,d){
         playerData.x = canvasWidth * Math.random();
         playerData.y = canvasHeight * Math.random();
         selectedPlayer.push(playerData)
+        updateCountry(d)
+        console.log("The country is: " + d.country);
     }else{
         selectedPlayer =selectedPlayer.filter(player => player.name !== d);
+        updateCountry(d, true)
     }
     updateGraph()
-    updateCountry(d)
 }
 
 function updateGraph(){
@@ -129,19 +128,43 @@ function updateSimulation(){
 }
 
 
-// As a player is selected, their country (and a count of the players FROM that country) will show on our "#country" as a flag.
-function updateCountry(currentPlayer, activeEdges) {
+// As a player is selected or unselected, add or remove their country
+function updateCountry(currentPlayer, deselect, activeEdges) {
+
     // Get this players country
     let currentCountry = playerCountryMap.get(currentPlayer);
 
-    // Add or Increment in our countries map
+    // Check if this country has already been added to our map. If it has, check if we need to increment, decrement, or remove it entirely
     if (selectedCountries.has(currentCountry)){
+
+        // Get count of players under this country
         let currentValue = selectedCountries.get(currentCountry);
-        selectedCountries.set(currentCountry, currentValue+= 1);
+
+        // If user deselects a player, remove or decrement
+        if (deselect){
+            console.log("Time to remove.");
+
+            // If there is only one player under this country, remove it
+            if (currentValue <= 1){
+                selectedCountries.delete(currentCountry);
+            }
+            // Otherwise, decrement the count
+            else{
+                selectedCountries.set(currentCountry, currentValue -= 1);
+            }
+        }
+        
+        // If a user selects a player, increment
+        else{
+            selectedCountries.set(currentCountry, currentValue += 1);
+            console.log("Time to add.");
+        }
     }
-    else{
+    // This country has not yet been added to our map, simply add
+    else{   
         selectedCountries.set(currentCountry, 1);
     }
+
 
 
     const div = d3.select('#country');
@@ -153,6 +176,38 @@ function updateCountry(currentPlayer, activeEdges) {
             .attr('src', "FlagImages\\" + String(key) + ".png")
             .attr('alt', 'Country flag')
             .style('width', '125px')
-            .style('height', '125px');
+            .style('height', '125px')
+            .on('mouseover', mouseOverTitle)
+            .on('mouseout', mouseOutTitle);
     });
+}
+
+
+function mouseOverTitle(e, d){
+    // Bold the border
+    d3.select(this)
+        .style('border', '5px solid black'); 
+
+
+    d3.select('#canvas')
+    .selectAll('circle')
+    // .filter(d => d.title == movie)
+    .transition()
+    .duration(200)
+    .attr('stroke-width', 10)
+    .attr('fill', 'lightgreen');
+
+}
+function mouseOutTitle(e, d){
+    // Unbold border
+    d3.select(this)
+        .style('border', 'none');
+        
+    d3.select('#canvas')
+    .selectAll('circle')
+    // .filter(d => d.title == movie)
+    .transition()
+    .duration(200)
+    .attr('stroke-width', 2)
+    .attr('fill', 'white');
 }
