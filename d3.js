@@ -1,16 +1,23 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 let players
 let selectedPlayer =[]
+let playerCountryMap = new Map();
+let selectedCountries = new Map();
+
 window.onload = async () => {
     
     let data = await d3.csv("./all_seasons.csv");
     let playerSet = new Set()
     for (let player of data) {
         playerSet.add(player.player_name)
+        playerCountryMap.set(player.player_name, player.country); // Also create a map to pull this players country 
     }
     players = Array.from(playerSet).sort()
     makePlayerList()
+  
+  
 
+    // Used to know which flags I need to get from google
     let countries = Array.from(new Set(data.map(d => d.country)));
     console.log("Unique Countries:", countries);
 
@@ -52,7 +59,7 @@ function handlePlayerOnClick(e,d){
         selectedPlayer =selectedPlayer.filter(player => player.name !== d);
     }
     updateGraph()
-    updateCountry()
+    updateCountry(d)
 }
 
 function updateGraph(){
@@ -123,40 +130,29 @@ function updateSimulation(){
 
 
 // As a player is selected, their country (and a count of the players FROM that country) will show on our "#country" as a flag.
-function updateCountry(activeEdges) {
-    // Check the most recently selected player 
-    // Pull its country from the map we made
-    // Use that to check if this is w/n our set of flags
-    // Add if not
-    // Clear the flags
-    // Re-print them
+function updateCountry(currentPlayer, activeEdges) {
+    // Get this players country
+    let currentCountry = playerCountryMap.get(currentPlayer);
 
+    // Add or Increment in our countries map
+    if (selectedCountries.has(currentCountry)){
+        let currentValue = selectedCountries.get(currentCountry);
+        selectedCountries.set(currentCountry, currentValue+= 1);
+    }
+    else{
+        selectedCountries.set(currentCountry, 1);
+    }
 
-
-
-    // const images = ['FlagImages/USA.png', 'FlagImages/Canada.png', 'FlagImages/USA.png', 'FlagImages/Jamacia.png', 'FlagImages/Lithuania.png', 'FlagImages/Nigeria.png'];
-    const images = ['FlagImages/USA.png', 'FlagImages/Canada.png'];
 
     const div = d3.select('#country');
-    // div.selectAll('img').remove();
+    div.selectAll('img').remove(); // Reset the flags
 
-    // Append new images
-    images.forEach(src => {
+    // Append and reprint updated flags
+    selectedCountries.forEach(function(_, key){
         div.append('img')
-            .attr('src', src)
+            .attr('src', "FlagImages\\" + String(key) + ".png")
             .attr('alt', 'Country flag')
             .style('width', '125px')
             .style('height', '125px');
     });
 }
-
-// Plan: 
-// Make a map (parse the country appreviation and make that the key)
-// When a player gets clicked, parse their origin country, pull from map, and update the file to pull
-// Note: Do we even need a map? Or can we just convert that to a string and concat .jpg to it....
-// May not even need one tbh
-
-
-// Accessing data into csv's is O(n). So, we could do a map w/ key of player name and val would be of country
-// Somehow pull this certain element/name w/ "this" somewhere above in the code 
-// Then convert to a string, concat .jpg and pull the img
