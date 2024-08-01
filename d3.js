@@ -53,7 +53,6 @@ function handlePlayerOnClick(e,d){
         playerData.y = canvasHeight * Math.random();
         selectedPlayer.push(playerData)
         updateCountry(d)
-        console.log("The country is: " + d.country);
     }else{
         selectedPlayer =selectedPlayer.filter(player => player.name !== d);
         updateCountry(d, true)
@@ -98,6 +97,9 @@ function updateGraph(){
         //DOM elements with no corresponding array data
         remove.remove()
     })
+    // .each(function(d) {
+    //     console.log("The selected names are: " + d.name);
+    // })
     updateSimulation()
 }
 
@@ -178,8 +180,21 @@ function updateCountry(currentPlayer, deselect, activeEdges) {
             .style('width', '125px')
             .style('height', '125px')
             .on('mouseover', mouseOverTitle)
-            .on('mouseout', mouseOutTitle);
+            .on('mouseout', mouseOutTitle)
+            .text(currentCountry);
     });
+
+
+    // Now I have access to each of the nodes names. Now I just need to add a "country" attribute to each node. 
+    // Note: Likey each flag will need a "country" tag attached to it simiar to this: let movie = d3.select(this).text(); 
+    // Just set the text like he did above and pull it.
+
+    let canvas = d3.select('#canvas')
+    canvas
+    .selectAll('g')
+    .each(function(d) {
+        console.log("The current name is: " + d.name);
+    })
 }
 
 
@@ -187,17 +202,21 @@ function mouseOverTitle(e, d){
     // Bold the border
     d3.select(this)
         .style('border', '5px solid black'); 
+    
+    let currentFlag = d3.select(this).text(); 
+    console.log("The current country selected is: " + currentFlag);
 
-
+    // Emphasize the nodes that have this same country 
     d3.select('#canvas')
     .selectAll('circle')
-    // .filter(d => d.title == movie)
     .transition()
     .duration(200)
     .attr('stroke-width', 10)
     .attr('fill', 'lightgreen');
-
 }
+
+
+
 function mouseOutTitle(e, d){
     // Unbold border
     d3.select(this)
@@ -205,7 +224,6 @@ function mouseOutTitle(e, d){
         
     d3.select('#canvas')
     .selectAll('circle')
-    // .filter(d => d.title == movie)
     .transition()
     .duration(200)
     .attr('stroke-width', 2)
