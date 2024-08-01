@@ -277,8 +277,7 @@ function mouseOverFlag(e, d){
     // Pull this flags country
     let currentFlag = d3.select(this).text(); 
 
-    let canvas = d3.select('#canvas')
-    canvas
+    d3.select('#canvas')
     .selectAll('g')
     .filter(d => d.country == currentFlag) // Only get nodes that are of the same country
     .selectAll('circle')
@@ -291,11 +290,13 @@ function mouseOverFlag(e, d){
 
 
 function mouseOutFlag(e, d){
-    let currentFlag = d3.select(this).text(); 
 
     // Unbold border
     d3.select(this)
         .style('border', 'none');
+    
+    let currentFlag = d3.select(this).text(); 
+
     d3.select('#canvas')
     .selectAll('circle')
     .filter(d => d.country == currentFlag)
