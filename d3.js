@@ -4,10 +4,8 @@ let selectedPlayer = []
 let playerCountryMap = new Map();
 let selectedCountries = new Map();
 let playerEdges = {}
-
+let data = await d3.csv("./all_seasons.csv");
 window.onload = async () => {
-
-    let data = await d3.csv("./all_seasons.csv");
     let playerSet = new Set()
     for (let player of data) {
         let playerName = player.player_name;
@@ -18,6 +16,14 @@ window.onload = async () => {
         }
         playerEdges[playerName]["team"].add(player.team_abbreviation)
     }
+    players = Array.from(playerSet).sort()
+    makePlayerList()
+    await populatePlayerEdges(data, playerEdges);
+    // Used to know which flags I need to get from google
+    let countries = Array.from(new Set(data.map(d => d.country)));
+}
+
+async function populatePlayerEdges(data, playerEdges) {
     for (let player of data) {
         let playerName = player.player_name;
         let playerTeams = playerEdges[playerName]["team"];
@@ -28,14 +34,6 @@ window.onload = async () => {
             }
         }
     }
-    players = Array.from(playerSet).sort()
-    makePlayerList()
-
-    // Used to know which flags I need to get from google
-    let countries = Array.from(new Set(data.map(d => d.country)));
-    // console.log("Unique Countries:", countries);
-    // console.log(playerEdges);
-
 }
 
 function makePlayerList() {
@@ -84,6 +82,7 @@ function updateGraph() {
         for(let relatedPlayer of playerEdges[player.name]["related"]){
             if(relatedPlayer> player.name && selectedPlayer.find(x=>x.name==relatedPlayer)){
                 let edge = {
+                    // The value has to be an object so the updateEdgePositions can trace the nodes
                     "source":player,
                     "target":selectedPlayer.find(x=>x.name==relatedPlayer),
                 }
@@ -187,10 +186,12 @@ function updateSimulation(activeEdges) {
         //Repel nodes from each other if .strength is negative
         .force("charge", d3.forceManyBody().strength(-5000))
         .force('spring', d3.forceLink(activeEdges)
+        // Specify the identifier for the nodes
         .id(d => d.name)
-        .distance(10)  // Adjust the target distance
+        .distance(10)
+        // Adjust the strength of the force
         .strength(0.05))
-
+        // Add the bounding box force to keep the nodes in the canvas
         .force('bounding-box', boundingBox())
         // on tick means each iteration
         .on('tick', () => {
