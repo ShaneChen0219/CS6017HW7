@@ -4,8 +4,9 @@ let selectedPlayer = []
 let playerCountryMap = new Map();
 let selectedCountries = new Map();
 let playerEdges = {}
-let data = await d3.csv("./all_seasons.csv");
+let data
 window.onload = async () => {
+    data = await d3.csv("./all_seasons.csv");
     let playerSet = new Set()
     for (let player of data) {
         let playerName = player.player_name;
