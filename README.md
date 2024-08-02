@@ -6,6 +6,6 @@
 ### Website Link
 https://shanechen0219.github.io/CS6017HW7/
 
-### Video Link (to download)
+### Video Link (to download Raw File)
 [Demo Video](/ProjectPresentation.mp4)
 
